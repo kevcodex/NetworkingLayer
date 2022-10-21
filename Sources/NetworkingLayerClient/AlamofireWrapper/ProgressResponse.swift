@@ -16,10 +16,10 @@ struct ProgressResponse {
 }
 
 public struct ProgressHandler {
-    let progressBlock: ((ProgressResponse) -> Void)
-    let callbackQueue: DispatchQueue
+    public let progressBlock: ((ProgressResponse) -> Void)
+    public let callbackQueue: DispatchQueue
 
-    init(callbackQueue: DispatchQueue = .main,
+    public init(callbackQueue: DispatchQueue = .main,
          progressBlock: @escaping ((ProgressResponse) -> Void)) {
         self.callbackQueue = callbackQueue
         self.progressBlock = progressBlock

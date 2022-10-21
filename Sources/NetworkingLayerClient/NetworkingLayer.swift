@@ -40,6 +40,8 @@ public struct NetworkingLayer: Networkable {
     private var wrapper: AlamofireWrapper = {
         return AlamofireWrapper()
     }()
+    
+    public init() {}
 
     /// Send a request to expect data from response.
     /// - Parameter callbackQueue: nil will default to main.

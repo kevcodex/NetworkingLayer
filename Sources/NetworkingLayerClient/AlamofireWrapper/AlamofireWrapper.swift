@@ -16,12 +16,12 @@ struct AlamofireWrapper {
     private let handler: AlamofireWrapperHandler
 
     #if !(os(watchOS) || os(Linux) || os(Windows))
-    var isConnectedToInternet: Bool {
+    public var isConnectedToInternet: Bool {
         return Self.isConnectedToInternet
     }
 
 
-    static var isConnectedToInternet: Bool {
+    public static var isConnectedToInternet: Bool {
         return NetworkReachabilityManager()?.isReachable ?? false
     }
     #endif

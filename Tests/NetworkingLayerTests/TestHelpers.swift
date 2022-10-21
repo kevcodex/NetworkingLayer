@@ -12,6 +12,8 @@ enum MockStandardRequest: NetworkRequest {
     case validRequestWithJSONBody
     case validDownload
     case validMultipart
+    case validRequestWithQueryParamsEncoded
+    case validRequestWithCustomQueryParamsEncoded
     
     var baseURL: URL? {
         switch self {
@@ -31,6 +33,10 @@ enum MockStandardRequest: NetworkRequest {
         case .validDownload:
             return URL(string: "https://mockurlawfgafwafawf.com")
         case .validMultipart:
+            return URL(string: "https://mockurlawfgafwafawf.com")
+        case .validRequestWithQueryParamsEncoded:
+            return URL(string: "https://mockurlawfgafwafawf.com")
+        case .validRequestWithCustomQueryParamsEncoded:
             return URL(string: "https://mockurlawfgafwafawf.com")
         }
     }
@@ -54,12 +60,15 @@ enum MockStandardRequest: NetworkRequest {
             return ""
         case .validMultipart:
             return ""
+        case .validRequestWithQueryParamsEncoded:
+            return ""
+        case .validRequestWithCustomQueryParamsEncoded:
+            return ""
         }
     }
     
     var method: HTTPMethod {
         switch self {
-            
         case .validRequest:
             return .get
         case .validRequestWithPath:
@@ -76,10 +85,15 @@ enum MockStandardRequest: NetworkRequest {
             return .get
         case .validMultipart:
             return .post
+        case .validRequestWithQueryParamsEncoded:
+            return .get
+        case .validRequestWithCustomQueryParamsEncoded:
+            return .get
+            
         }
     }
     
-    var parameters: [String : Any]? {
+    var parameters: NetworkQuery? {
         switch self {
         case .validRequest:
             return nil
@@ -88,7 +102,7 @@ enum MockStandardRequest: NetworkRequest {
         case .invalidRequest:
             return nil
         case .validRequestWithQueryParams:
-            return ["foo": "bar", "fooz": "barz"]
+            return  NetworkQuery(parameters: ["foo": "bar", "fooz": "barz"])
         case .validRequestWithHeaders:
             return nil
         case .validRequestWithJSONBody:
@@ -97,6 +111,12 @@ enum MockStandardRequest: NetworkRequest {
             return nil
         case .validMultipart:
             return nil
+        case .validRequestWithQueryParamsEncoded:
+            return NetworkQuery(parameters: ["foo": "bar%a", "fooz": "ba#rz"])
+        case .validRequestWithCustomQueryParamsEncoded:
+            var characterSet = CharacterSet.urlQueryAllowed
+            characterSet.remove("+")
+            return NetworkQuery(parameters: ["foo": "bar%a", "fooz": "ba#rz", "fooz1": "ba+rz"], encoding: .custom(characterSet))
         }
     }
     
@@ -117,6 +137,10 @@ enum MockStandardRequest: NetworkRequest {
         case .validDownload:
             return nil
         case .validMultipart:
+            return nil
+        case .validRequestWithQueryParamsEncoded:
+            return nil
+        case .validRequestWithCustomQueryParamsEncoded:
             return nil
         }
     }
@@ -146,6 +170,10 @@ enum MockStandardRequest: NetworkRequest {
             return nil
         case .validMultipart:
             return nil
+        case .validRequestWithQueryParamsEncoded:
+            return nil
+        case .validRequestWithCustomQueryParamsEncoded:
+            return nil
         }
     }
     
@@ -168,6 +196,10 @@ enum MockStandardRequest: NetworkRequest {
         case .validMultipart:
             let body1 = MultipartData(data: Data(), name: "foo", fileName: "foo.png", mimeType: "image/png")
             return .uploadMultipart(body: [body1])
+        case .validRequestWithQueryParamsEncoded:
+            return .requestData
+        case .validRequestWithCustomQueryParamsEncoded:
+            return .requestData
         }
     }
 }
@@ -192,7 +224,7 @@ struct MockCodableRequest: CodableRequest {
         return .get
     }
     
-    var parameters: [String : Any]?
+    var parameters: NetworkQuery?
     
     var headers: [String : Any]?
     

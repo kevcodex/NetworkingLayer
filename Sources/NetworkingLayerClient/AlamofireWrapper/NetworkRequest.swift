@@ -21,7 +21,7 @@ public protocol NetworkRequest {
     var baseURL: URL? { get }
     var path: String { get }
     var method: HTTPMethod { get }
-    var parameters: [String: Any]? { get }
+    var parameters: NetworkQuery? { get }
     var headers: [String: Any]? { get }
     var body: NetworkBody? { get }
     var requestType: RequestType { get }
@@ -96,17 +96,24 @@ private extension NetworkRequest {
         request.httpMethod = method.name
     }
 
-    func addQueryParameters(_ parameters: [String: Any]?, to request: inout URLRequest) {
-        guard let parameters = parameters,
+    func addQueryParameters(_ query: NetworkQuery?, to request: inout URLRequest) {
+        guard let query = query,
               let url = request.url else {
             return
         }
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         
-        let characterSet = CharacterSet.urlQueryAllowed
+        let characterSet: CharacterSet = {
+            switch query.encoding {
+            case .standard:
+                return CharacterSet.urlQueryAllowed
+            case .custom(let set):
+                return set
+            }
+        }()
         
-        components?.percentEncodedQuery = parameters.compactMap {
+        components?.percentEncodedQuery = query.parameters.compactMap {
             guard let key = $0.addingPercentEncoding(withAllowedCharacters: characterSet),
                   let value = String(describing: $1).addingPercentEncoding(withAllowedCharacters: characterSet) else {
                 return nil

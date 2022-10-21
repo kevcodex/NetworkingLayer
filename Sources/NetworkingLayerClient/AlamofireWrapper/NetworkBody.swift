@@ -31,12 +31,4 @@ public struct NetworkBody {
     }
 }
 
-struct NetworkQuery {
-    let parameters: [String: Any]
-    let encoding: QueryEncodingType
-    
-    enum QueryEncodingType {
-        case standard
-        case custom
-    }
-}
+

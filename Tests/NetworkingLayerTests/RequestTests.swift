@@ -72,6 +72,41 @@ final class RequestTests: XCTestCase {
         XCTAssertTrue(sortedQueryItems == expectedQueries)
     }
     
+    func testBuildingURL_WithQueryParamsEncoded_IsSuccessful() {
+        let request = MockStandardRequest.validRequestWithQueryParamsEncoded
+        
+        let urlRequest = request.buildURLRequest()
+        
+        let expectedQueries = [URLQueryItem(name: "foo", value: "bar%a"),
+                               URLQueryItem(name: "fooz", value: "ba#rz")]
+        let expectedPercentEndocodedQuery = "foo=bar%25a&fooz=ba%23rz"
+        
+        let components = URLComponents(url: urlRequest!.url!, resolvingAgainstBaseURL: false)
+        
+        let sortedQueryItems = components?.queryItems?.sorted { $0.name < $1.name }
+        
+        XCTAssertTrue(sortedQueryItems == expectedQueries)
+        XCTAssertTrue(components?.percentEncodedQuery?.components(separatedBy: "&").sorted() == expectedPercentEndocodedQuery.components(separatedBy: "&").sorted())
+    }
+    
+    func testBuildingURL_WithCustomQueryParamsEncoded_IsSuccessful() {
+        let request = MockStandardRequest.validRequestWithCustomQueryParamsEncoded
+        
+        let urlRequest = request.buildURLRequest()
+        
+        let expectedQueries = [URLQueryItem(name: "foo", value: "bar%a"),
+                               URLQueryItem(name: "fooz", value: "ba#rz"),
+                               URLQueryItem(name: "fooz1", value: "ba+rz")]
+        let expectedPercentEndocodedQuery = "foo=bar%25a&fooz=ba%23rz&fooz1=ba%2Brz"
+        
+        let components = URLComponents(url: urlRequest!.url!, resolvingAgainstBaseURL: false)
+        
+        let sortedQueryItems = components?.queryItems?.sorted { $0.name < $1.name }
+        
+        XCTAssertTrue(sortedQueryItems == expectedQueries)
+        XCTAssertTrue(components?.percentEncodedQuery?.components(separatedBy: "&").sorted() == expectedPercentEndocodedQuery.components(separatedBy: "&").sorted())
+    }
+    
     func testBuildingURL_WithHeaders_IsSuccessful() {
         let request = MockStandardRequest.validRequestWithHeaders
         

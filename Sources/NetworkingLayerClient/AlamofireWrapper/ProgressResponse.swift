@@ -2,15 +2,15 @@
 
 import Foundation
 
-struct ProgressResponse {
+public struct ProgressResponse {
 
-    let progress: Progress
+    public let progress: Progress
 
-    init(progress: Progress) {
+    public init(progress: Progress) {
         self.progress = progress
     }
 
-    var isCompleted: Bool {
+    public var isCompleted: Bool {
         return progress.fractionCompleted == 1.0
     }
 }

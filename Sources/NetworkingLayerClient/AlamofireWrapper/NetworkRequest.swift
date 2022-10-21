@@ -60,11 +60,11 @@ extension NetworkRequest {
         return urlRequest
     }
 
-    var acceptableStatusCodes: [Int] {
+    public var acceptableStatusCodes: [Int] {
         return Array(200..<300)
     }
 
-    var url: URL? {
+    public var url: URL? {
         guard let baseURL = baseURL else {
             return nil
         }
@@ -76,7 +76,7 @@ extension NetworkRequest {
         return baseURL.appendingPathComponent(path)
     }
 
-    var testURL: URL? {
+    public var testURL: URL? {
         nil
     }
 }

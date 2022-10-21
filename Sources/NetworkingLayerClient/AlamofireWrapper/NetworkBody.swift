@@ -8,12 +8,12 @@ public struct NetworkBody {
 
     let encoding: NetworkEncodingType
 
-    init(data: Data, encoding: NetworkEncodingType) {
+    public init(data: Data, encoding: NetworkEncodingType) {
         self.data = data
         self.encoding = encoding
     }
 
-    init(dictionary: [String: Any], encoding: NetworkEncodingType, options: JSONSerialization.WritingOptions = []) throws {
+    public init(dictionary: [String: Any], encoding: NetworkEncodingType, options: JSONSerialization.WritingOptions = []) throws {
 
         var data: Data
 
@@ -25,7 +25,7 @@ public struct NetworkBody {
         self.init(data: data, encoding: encoding)
     }
 
-    init<E: Encodable>(object: E, encoding: NetworkEncodingType, encoder: JSONEncoder = JSONEncoder()) throws {
+    public init<E: Encodable>(object: E, encoding: NetworkEncodingType, encoder: JSONEncoder = JSONEncoder()) throws {
         let data = try encoder.encode(object)
         self.init(data: data, encoding: encoding)
     }

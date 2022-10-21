@@ -3,7 +3,7 @@
 
 import Foundation
 
-enum NetworkEncodingType {
+public enum NetworkEncodingType {
     case json
 }
 

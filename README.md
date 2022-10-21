@@ -1,3 +1,3 @@
 # NetworkingLayer
 
-A description of this package.
+Simple wrapper around almofire

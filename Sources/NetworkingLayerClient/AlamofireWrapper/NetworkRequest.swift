@@ -22,7 +22,8 @@ public protocol NetworkRequest {
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: NetworkQuery? { get }
-    var headers: [String: Any]? { get }
+    /// Can use dictionary or header to build
+    @HeaderBuilder var headers: [Header]? { get }
     var body: NetworkBody? { get }
     var requestType: RequestType { get }
     var acceptableStatusCodes: [Int] { get }
@@ -124,7 +125,7 @@ private extension NetworkRequest {
         request.url = components?.url
     }
 
-    func addHeaders(_ headers: [String: Any]?, to request: inout URLRequest) {
+    func addHeaders(_ headers: [Header]?, to request: inout URLRequest) {
         guard let headers = headers else {
             return
         }

@@ -155,4 +155,28 @@ final class RequestTests: XCTestCase {
         
         XCTAssertTrue(foo == expectedFoo)
     }
+    
+    func testHeaderBuilder() {
+        let request = HeaderBuildTestRequest(bool: true)
+        
+        let urlRequest = request.buildURLRequest()
+        
+        XCTAssertTrue(urlRequest?.headers.count == 6)
+
+        XCTAssertTrue(urlRequest?.headers["if"] == "test")
+        XCTAssertTrue(urlRequest?.headers["e"] == "f")
+        XCTAssertTrue(urlRequest?.headers["g"] == "h")
+        XCTAssertTrue(urlRequest?.headers["array"] == "test")
+        XCTAssertTrue(urlRequest?.headers["dict"] == "test")
+        XCTAssertTrue(urlRequest?.headers["optional"] == "test")
+    }
+    
+    func testHeaderBuilder_SecondConditional() {
+        let request = HeaderBuildTestRequest(bool: false)
+        
+        let urlRequest = request.buildURLRequest()
+        
+
+        XCTAssertTrue(urlRequest?.headers["if"] == "test2")
+    }
 }

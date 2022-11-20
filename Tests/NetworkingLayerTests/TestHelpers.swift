@@ -120,7 +120,7 @@ enum MockStandardRequest: NetworkRequest {
         }
     }
     
-    var headers: [String : Any]? {
+    var headers: [Header]? {
         switch self {
         case .validRequest:
             return nil
@@ -131,7 +131,7 @@ enum MockStandardRequest: NetworkRequest {
         case .validRequestWithQueryParams:
             return nil
         case .validRequestWithHeaders:
-            return ["foo": "bar", "fooz": "barz"]
+            return [.init(key: "foo", value: "bar"), .init(key: "fooz", value: "barz")]
         case .validRequestWithJSONBody:
             return nil
         case .validDownload:
@@ -226,7 +226,52 @@ struct MockCodableRequest: CodableRequest {
     
     var parameters: NetworkQuery?
     
-    var headers: [String : Any]?
+    var headers: [Header]?
+    
+    var body: NetworkBody?
+    
+    var requestType: RequestType {
+        .requestData
+    }
+}
+
+struct HeaderBuildTestRequest: NetworkRequest {
+    
+    let bool: Bool
+
+    var baseURL: URL? {
+        return URL(string: "https://mockurlawfgafwafawf.com")
+    }
+    
+    var path: String {
+        return ""
+    }
+    
+    var method: HTTPMethod {
+        return .get
+    }
+    
+    var parameters: NetworkQuery?
+    
+    var headers: [Header]? {
+        if bool {
+            Header(key: "if", value: "test")
+        } else {
+            Header(key: "if", value: "test2")
+        }
+        Header(key: "e", value: "f")
+        Header(key: "g", value: "h")
+        
+        [Header(key: "array", value: "test")]
+        
+        ["dict": "test"]
+        
+        let optional: Header? = Header(key: "optional", value: "test")
+        
+        if let optional {
+            optional
+        }
+    }
     
     var body: NetworkBody?
     

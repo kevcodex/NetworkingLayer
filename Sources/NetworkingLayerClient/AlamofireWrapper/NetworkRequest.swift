@@ -40,7 +40,7 @@ public protocol NetworkRequest {
 
 extension NetworkRequest {
 
-    func buildURLRequest() -> URLRequest? {
+    public func buildURLRequest() -> URLRequest? {
 
         guard let baseURL = baseURL else {
             return nil

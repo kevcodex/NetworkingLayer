@@ -36,6 +36,10 @@ public struct HeaderBuilder {
     public static func buildEither(second component: [Header]) -> [Header] {
         component
     }
+    
+    public static func buildArray(_ components: [[Header]]) -> [Header] {
+        components.flatMap { $0 }
+    }
 }
 
 public struct Header {

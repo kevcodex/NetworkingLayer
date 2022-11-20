@@ -271,6 +271,10 @@ struct HeaderBuildTestRequest: NetworkRequest {
         if let optional {
             optional
         }
+        
+        for test in [Header(key: "foo", value: "bar"), Header(key: "baz", value: "fooz")] {
+            test
+        }
     }
     
     var body: NetworkBody?

@@ -43,8 +43,14 @@ public struct HeaderBuilder {
 }
 
 public struct Header {
-    let key: String
-    let value: Any
+    public let key: String
+    public let value: Any
+    
+    public init(key: String, value: Any) {
+        self.key = key
+        self.value = value
+    }
+    
 }
 
 // MARK: - Standard Headers

@@ -8,6 +8,8 @@ import FoundationNetworking
 
 /// Handler that will get local test data.
 struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
+
+    
     func handleDataRequest(for urlRequest: URLRequest, manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, progressHandler: ProgressHandler?) async throws -> NetworkResponse {
         
         guard let url = request.testURL,
@@ -48,6 +50,17 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
         
         // TODO: - setup return for download response
         return nil
+    }
+    
+    func handleUploadMultipart(for urlRequest: URLRequest, multipartBody: [MultipartData], manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, usingThreshold encodingMemoryThreshold: UInt64, uploadProgressHandler: ProgressHandler?) async throws -> NetworkResponse {
+        guard let url = request.testURL,
+              let data = try? Data(contentsOf: url) else {
+                  throw AlamofireWrapperError.badRequest(message: "missing test data")
+              }
+        
+        let response = NetworkResponse(statusCode: 200, data: data, request: nil, httpResponse: nil)
+        
+        return response
     }
     
     func handleUploadMultipart(for urlRequest: URLRequest, multipartBody: [MultipartData], manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, usingThreshold encodingMemoryThreshold: UInt64, uploadProgressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {

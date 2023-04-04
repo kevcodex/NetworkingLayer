@@ -36,6 +36,14 @@ protocol AlamofireWrapperHandler {
                                destination: DownloadDestination?,
                                progressHandler: ProgressHandler?,
                                completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?
+    
+    func handleUploadMultipart(for urlRequest: URLRequest,
+                               multipartBody: [MultipartData],
+                               manager: AlamofireWrapperManager,
+                               request: NetworkRequest,
+                               callbackQueue: DispatchQueue,
+                               usingThreshold encodingMemoryThreshold: UInt64,
+                               uploadProgressHandler: ProgressHandler?) async throws -> NetworkResponse
 
     func handleUploadMultipart(for urlRequest: URLRequest,
                                multipartBody: [MultipartData],
@@ -174,6 +182,48 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                     completion(.failure(.unknown))
                 }
             }
+    }
+    
+    func handleUploadMultipart(for urlRequest: URLRequest,
+                               multipartBody: [MultipartData],
+                               manager: AlamofireWrapperManager,
+                               request: NetworkRequest,
+                               callbackQueue: DispatchQueue,
+                               usingThreshold encodingMemoryThreshold: UInt64,
+                               uploadProgressHandler: ProgressHandler?) async throws -> NetworkResponse {
+        
+        let task = manager.upload(
+            multipartFormData: { (multiPartData) in
+                for bodyPart in multipartBody {
+                    if let fileName = bodyPart.fileName, let mimeType = bodyPart.mimeType {
+                        multiPartData.append(bodyPart.data, withName: bodyPart.name, fileName: fileName, mimeType: mimeType)
+                    } else {
+                        multiPartData.append(bodyPart.data, withName: bodyPart.name)
+                    }
+                }
+            },
+            usingThreshold: encodingMemoryThreshold,
+            with: urlRequest)
+            .validate(statusCode: request.acceptableStatusCodes)
+            .uploadProgress(queue: uploadProgressHandler?.callbackQueue ?? .main) { (progress) in
+                let progressResponse = ProgressResponse(progress: progress)
+                uploadProgressHandler?.progressBlock(progressResponse)
+            }
+            .serializingData(automaticallyCancelling: false,
+                             dataPreprocessor: DataResponseSerializer.defaultDataPreprocessor,
+                             emptyResponseCodes: DataResponseSerializer.defaultEmptyResponseCodes,
+                             emptyRequestMethods: DataResponseSerializer.defaultEmptyRequestMethods)
+        
+        let uploadResponse = await task.response
+        
+        let result = handleDataResult(responseData: uploadResponse, urlRequest: urlRequest)
+        
+        switch result {
+        case .success(let response):
+            return response
+        case .failure(let error):
+            throw error
+        }
     }
 
     func handleUploadMultipart(

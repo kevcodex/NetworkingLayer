@@ -57,9 +57,14 @@ struct AlamofireWrapper {
                                                           progressHandler: progressHandler)
 
 
-        case .uploadMultipart(_):
-            assertionFailure("Not handled yet")
-            throw AlamofireWrapperError.badRequest(message: "Bad Request")
+        case .uploadMultipart(let body):
+            return try await handler.handleUploadMultipart(for: urlRequest,
+                                                           multipartBody: body,
+                                                           manager: manager,
+                                                           request: request,
+                                                           callbackQueue: callbackQueue,
+                                                           usingThreshold: MultipartFormData.encodingMemoryThreshold,
+                                                           uploadProgressHandler: progressHandler)
         }
     }
 

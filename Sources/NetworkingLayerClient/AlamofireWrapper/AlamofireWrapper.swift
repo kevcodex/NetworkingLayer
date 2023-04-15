@@ -7,8 +7,6 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public typealias DownloadDestination = Alamofire.DownloadRequest.Destination
-
 /// A simple wrapper around Alamofire to abstract out the request building from client.
 public struct AlamofireWrapper: Networkable {
     

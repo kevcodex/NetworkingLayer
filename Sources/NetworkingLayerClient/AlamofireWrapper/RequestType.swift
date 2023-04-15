@@ -1,6 +1,6 @@
 //  Copyright © 2020 Kirby. All rights reserved.
 
-import Alamofire
+import Foundation
 
 public enum RequestType {
     case requestData
@@ -11,3 +11,4 @@ public enum RequestType {
 
     case uploadMultipart(body: [MultipartData])
 }
+

@@ -115,8 +115,11 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                callbackQueue: DispatchQueue,
                                destination: DownloadDestination?,
                                progressHandler: ProgressHandler?) async throws -> NetworkResponse {
+        
+        let afDestination = createAFDestination(from: destination)
+
         let task = manager
-            .download(urlRequest, to: destination)
+            .download(urlRequest, to: afDestination)
             .validate(statusCode: request.acceptableStatusCodes)
             .downloadProgress(queue: progressHandler?.callbackQueue ?? .main) { (progress) in
                 let progressResponse = ProgressResponse(progress: progress)
@@ -148,8 +151,10 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
 
         // Note: Can't use responseData for downloading otherwise if destination url is nil, it will trigger a error for certain types of files. (this comment was from alamofire 4, not sure if the new 5 changed(
+        let afDestination = createAFDestination(from: destination)
+
         return manager
-            .download(urlRequest, to: destination)
+            .download(urlRequest, to: afDestination)
             .validate(statusCode: request.acceptableStatusCodes)
             .downloadProgress(queue: progressHandler?.callbackQueue ?? .main) { (progress) in
                 let progressResponse = ProgressResponse(progress: progress)
@@ -299,6 +304,31 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                     return .failure(.responseError(error, response: nil))
                 }
             }
+    }
+    
+    private func createAFDestination(from destination: DownloadDestination?) -> Alamofire.DownloadRequest.Destination? {
+        let afDestination: Alamofire.DownloadRequest.Destination?
+        if let destination {
+            afDestination = { _, _ in
+                let destinationURL = destination.destinationURL
+                
+                var options: DownloadRequest.Options = []
+                for opt in destination.options {
+                    switch opt {
+                    case .createIntermediateDirectories:
+                        options.insert(.createIntermediateDirectories)
+                    case .removePreviousFile:
+                        options.insert(.removePreviousFile)
+                    }
+                }
+                
+                return (destinationURL, options)
+            }
+        } else {
+            afDestination = nil
+        }
+        
+        return afDestination
     }
 
     private func handleDataResponse(

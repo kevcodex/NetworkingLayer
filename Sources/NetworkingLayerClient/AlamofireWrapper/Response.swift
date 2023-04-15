@@ -23,7 +23,7 @@ public class NetworkResponse {
     }
 }
 
-class DownloadResponse: NetworkResponse {
+public class DownloadResponse: NetworkResponse {
     public let destinationURL: URL?
 
     public init(destinationURL: URL?, statusCode: Int, data: Data, request: URLRequest?, httpResponse: HTTPURLResponse?) {

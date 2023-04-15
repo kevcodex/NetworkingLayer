@@ -72,7 +72,7 @@ public struct AlamofireWrapper: Networkable {
     public func send<Request: NetworkRequest>(request: Request,
                                               callbackQueue: DispatchQueue = .main,
                                               progressHandler: ProgressHandler? = nil,
-                                              completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+                                              completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask? {
         
         guard let urlRequest = request.buildURLRequest() else {
             completion(.failure(.badRequest(message: "Bad URL Request")))
@@ -86,7 +86,7 @@ public struct AlamofireWrapper: Networkable {
                                              request: request,
                                              callbackQueue: callbackQueue,
                                              progressHandler: progressHandler,
-                                             completion: completion)
+                                             completion: completion)?.task
             
         case .download(let destination):
             return handler.handleDownloadRequest(for: urlRequest,
@@ -95,7 +95,7 @@ public struct AlamofireWrapper: Networkable {
                                                  callbackQueue: callbackQueue,
                                                  destination: destination,
                                                  progressHandler: progressHandler,
-                                                 completion: completion)
+                                                 completion: completion)?.task
             
         case .uploadMultipart(let body):
             return handler.handleUploadMultipart(for: urlRequest,
@@ -105,7 +105,7 @@ public struct AlamofireWrapper: Networkable {
                                                  callbackQueue: callbackQueue,
                                                  usingThreshold: MultipartFormData.encodingMemoryThreshold,
                                                  uploadProgressHandler: progressHandler,
-                                                 completion: completion)
+                                                 completion: completion)?.task
         }
     }
     
@@ -117,7 +117,7 @@ public struct AlamofireWrapper: Networkable {
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
         completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
-    -> AlamofireWrapperBaseRequest? {
+    -> NetworkTask? {
         
         send(request: codableRequest,
              callbackQueue: callbackQueue,
@@ -164,7 +164,7 @@ public struct AlamofireWrapper: Networkable {
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
         completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
-    -> AlamofireWrapperBaseRequest? {
+    -> NetworkTask? {
         
         send(request: request,
              callbackQueue: callbackQueue,

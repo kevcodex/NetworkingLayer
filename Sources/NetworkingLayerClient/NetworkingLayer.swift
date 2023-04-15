@@ -2,8 +2,6 @@
 // Copyright © 2020 Kirby. All rights reserved.
 
 import Foundation
-import Alamofire
-
 
 public protocol NetworkTask {
     func cancel()
@@ -19,7 +17,7 @@ public protocol Networkable {
         request: Request,
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
-        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?
+        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask?
     
     @discardableResult
     func send<Request: CodableRequest>(
@@ -27,7 +25,7 @@ public protocol Networkable {
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
         completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
-    -> AlamofireWrapperBaseRequest?
+    -> NetworkTask?
     
     @discardableResult
     func send<Request: NetworkRequest, C: Decodable>(
@@ -44,7 +42,7 @@ public protocol Networkable {
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
         completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
-    -> AlamofireWrapperBaseRequest?
+    -> NetworkTask?
     
     func cancelAll()
 }
@@ -67,7 +65,7 @@ public struct NetworkingLayer {
                                               callbackQueue: DispatchQueue = .main,
                                               progressHandler: ProgressHandler? = nil,
                                               completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask? {
-        wrapper.send(request: request, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)?.task
+        wrapper.send(request: request, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
     }
     
     /// Send a request to expect data from response.
@@ -87,7 +85,7 @@ public struct NetworkingLayer {
         progressHandler: ProgressHandler? = nil,
         completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
     -> NetworkTask? {
-        wrapper.send(codableRequest: codableRequest, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)?.task
+        wrapper.send(codableRequest: codableRequest, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
     }
     
     @discardableResult
@@ -99,7 +97,7 @@ public struct NetworkingLayer {
         completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
     -> NetworkTask? {
         
-        wrapper.send(request: request, codableType: codableType, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)?.task
+        wrapper.send(request: request, codableType: codableType, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
     }
     
     @discardableResult

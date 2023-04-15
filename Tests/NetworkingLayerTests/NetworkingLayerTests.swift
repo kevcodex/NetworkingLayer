@@ -22,7 +22,7 @@ final class NetworkingLayerTests: XCTestCase {
             }
         }
         
-        XCTAssert(foo?.task != nil)
+        XCTAssert(foo != nil)
     }
     
     func test_basicDownload_isSuccess() {
@@ -46,7 +46,7 @@ final class NetworkingLayerTests: XCTestCase {
             }
         }
         
-        XCTAssert(foo?.task != nil)
+        XCTAssert(foo != nil)
     }
     
     func test_basicCodable_isSucessful() {
@@ -67,7 +67,7 @@ final class NetworkingLayerTests: XCTestCase {
             }
         }
         
-        XCTAssert(foo?.task != nil)
+        XCTAssert(foo != nil)
     }
     
     func test_invalidBasicRequest_returnsError() {
@@ -105,7 +105,7 @@ final class NetworkingLayerTests: XCTestCase {
             }
         }
         
-        XCTAssert(foo?.task != nil)
+        XCTAssert(foo != nil)
     }
     
     func test_BasicMultipartUpload_IsSuccessful() {
@@ -132,7 +132,7 @@ final class NetworkingLayerTests: XCTestCase {
             }
         }
         
-        XCTAssert(foo?.task != nil)
+        XCTAssert(foo != nil)
     }
 }
 

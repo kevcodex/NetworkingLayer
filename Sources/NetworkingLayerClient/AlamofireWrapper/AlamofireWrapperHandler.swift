@@ -7,7 +7,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-protocol AlamofireWrapperHandler {
+public protocol AlamofireWrapperHandler {
     
     func handleDataRequest(for urlRequest: URLRequest,
                            manager: AlamofireWrapperManager,

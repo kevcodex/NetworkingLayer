@@ -4,7 +4,7 @@
 import Alamofire
 import Foundation
 
-protocol AlamofireWrapperManager {
+public protocol AlamofireWrapperManager {
     var session: URLSession { get }
 
     // These map the data requests to the wrapper
@@ -24,14 +24,14 @@ public protocol AlamofireWrapperBaseRequest {
 }
 
 /// Just an intermediate for requests that have the same methods
-protocol AlamofireWrapperRequest: AlamofireWrapperBaseRequest {
+public protocol AlamofireWrapperRequest: AlamofireWrapperBaseRequest {
 
     func validate<S: Sequence>(statusCode acceptableStatusCodes: S) -> Self where S.Iterator.Element == Int
     func downloadProgress(queue: DispatchQueue,
                           closure: @escaping Alamofire.Request.ProgressHandler) -> Self
 }
 
-protocol AlamofireWrapperDataRequest: AlamofireWrapperRequest {
+public protocol AlamofireWrapperDataRequest: AlamofireWrapperRequest {
     @discardableResult
     func responseData(queue: DispatchQueue,
                       dataPreprocessor: DataPreprocessor,
@@ -45,7 +45,7 @@ protocol AlamofireWrapperDataRequest: AlamofireWrapperRequest {
                          emptyRequestMethods: Set<Alamofire.HTTPMethod>) -> DataTask<Data>
 }
 
-protocol AlamofireWrapperDownloadRequest: AlamofireWrapperRequest {
+public protocol AlamofireWrapperDownloadRequest: AlamofireWrapperRequest {
     func response(queue: DispatchQueue,
                   completionHandler: @escaping (AFDownloadResponse<URL?>) -> Void) -> Self
     
@@ -55,7 +55,7 @@ protocol AlamofireWrapperDownloadRequest: AlamofireWrapperRequest {
                          emptyRequestMethods: Set<Alamofire.HTTPMethod>) -> DownloadTask<Data>
 }
 
-protocol AlamofireWrapperUploadRequest: AlamofireWrapperDataRequest {
+public protocol AlamofireWrapperUploadRequest: AlamofireWrapperDataRequest {
     @discardableResult
     func uploadProgress(queue: DispatchQueue, closure: @escaping Request.ProgressHandler) -> Self
     
@@ -69,19 +69,19 @@ protocol AlamofireWrapperUploadRequest: AlamofireWrapperDataRequest {
 
 // MARK: - Alamofire conformance
 extension Session: AlamofireWrapperManager {
-    func request(_ urlRequest: URLRequestConvertible) -> AlamofireWrapperDataRequest {
+    public func request(_ urlRequest: URLRequestConvertible) -> AlamofireWrapperDataRequest {
 
         let dataRequest: DataRequest = request(urlRequest)
         return dataRequest
     }
 
-    func download(_ urlRequest: URLRequestConvertible, to destination: DownloadRequest.Destination?) -> AlamofireWrapperDownloadRequest {
+    public func download(_ urlRequest: URLRequestConvertible, to destination: DownloadRequest.Destination?) -> AlamofireWrapperDownloadRequest {
         let request: DownloadRequest = download(urlRequest, to: destination)
 
         return request
     }
     
-    func upload(multipartFormData: @escaping (MultipartFormData) -> Void,
+    public func upload(multipartFormData: @escaping (MultipartFormData) -> Void,
                 usingThreshold encodingMemoryThreshold: UInt64,
                 with urlRequest: URLRequestConvertible) -> AlamofireWrapperUploadRequest {
         let request: UploadRequest = upload(multipartFormData: multipartFormData,

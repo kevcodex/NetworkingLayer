@@ -6,6 +6,10 @@ import Alamofire
 
 
 public protocol Networkable {
+    func send<Request: NetworkRequest>(request: Request,
+                                       callbackQueue: DispatchQueue,
+                                       progressHandler: ProgressHandler?) async throws -> NetworkResponse
+    
     @discardableResult
     func send<Request: NetworkRequest>(
         request: Request,
@@ -26,22 +30,31 @@ public protocol Networkable {
         request: Request,
         codableType: C.Type,
         callbackQueue: DispatchQueue,
+        progressHandler: ProgressHandler?)
+    async throws -> ResponseObject<C>
+    
+    @discardableResult
+    func send<Request: NetworkRequest, C: Decodable>(
+        request: Request,
+        codableType: C.Type,
+        callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
         completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
     -> AlamofireWrapperBaseRequest?
     
+    func cancelAll()
 }
 
 /// The layer that determines where to get data.
 /// If unit testing it will use test handler which sends back test data.
 /// In future, if we cahce maybe get from offline storage.
-public struct NetworkingLayer: Networkable {
+public struct NetworkingLayer {
     
-    private var wrapper: AlamofireWrapper = {
-        return AlamofireWrapper()
-    }()
+    let wrapper: Networkable
     
-    public init() {}
+    public init(wrapper: Networkable = AlamofireWrapper()) {
+        self.wrapper = wrapper
+    }
 
     /// Send a request to expect data from response.
     /// - Parameter callbackQueue: nil will default to main.

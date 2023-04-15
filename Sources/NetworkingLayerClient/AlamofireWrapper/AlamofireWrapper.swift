@@ -10,7 +10,7 @@ import FoundationNetworking
 public typealias DownloadDestination = Alamofire.DownloadRequest.Destination
 
 /// A simple wrapper around Alamofire to abstract out the request building from client.
-struct AlamofireWrapper {
+public struct AlamofireWrapper: Networkable {
 
     private let manager: AlamofireWrapperManager
     private let handler: AlamofireWrapperHandler
@@ -26,14 +26,14 @@ struct AlamofireWrapper {
     }
     #endif
 
-    init(manager: AlamofireWrapperManager = AlamofireWrapper.defaultManager,
+    public init(manager: AlamofireWrapperManager = AlamofireWrapper.defaultManager,
          handler: AlamofireWrapperHandler = AlamofireWrapper.defaultHandler) {
         self.manager = manager
         self.handler = handler
     }
     
     // One problem is cancelling a task. Might want a wrapper that creates a task then sends.
-    func send<Request: NetworkRequest>(request: Request,
+    public func send<Request: NetworkRequest>(request: Request,
                                        callbackQueue: DispatchQueue = .main,
                                        progressHandler: ProgressHandler? = nil) async throws -> NetworkResponse {
         guard let urlRequest = request.buildURLRequest() else {
@@ -71,7 +71,7 @@ struct AlamofireWrapper {
     /// Send a request to expect data from response.
     /// - Parameter callbackQueue: nil will default to main.
     @discardableResult
-    func send<Request: NetworkRequest>(request: Request,
+    public func send<Request: NetworkRequest>(request: Request,
                                        callbackQueue: DispatchQueue = .main,
                                        progressHandler: ProgressHandler? = nil,
                                        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
@@ -114,7 +114,7 @@ struct AlamofireWrapper {
     // MARK: Codable Requests
     /// Makes a network request with any codable response object and will return it.
     @discardableResult
-    func send<Request: CodableRequest>(
+    public func send<Request: CodableRequest>(
         codableRequest: Request,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
@@ -130,8 +130,9 @@ struct AlamofireWrapper {
     }
     
     /// Makes a network request with any codable response object and will return it.
+    
     @discardableResult
-    func send<Request: CodableRequest>(
+    public func send<Request: CodableRequest>(
         codableRequest: Request,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil) async throws -> ResponseObject<Request.Response> {
@@ -144,7 +145,7 @@ struct AlamofireWrapper {
         }
     
     @discardableResult
-    func send<Request: NetworkRequest, C: Decodable>(
+    public func send<Request: NetworkRequest, C: Decodable>(
         request: Request,
         codableType: C.Type,
         callbackQueue: DispatchQueue = .main,
@@ -159,7 +160,7 @@ struct AlamofireWrapper {
     }
 
     @discardableResult
-    func send<Request: NetworkRequest, C: Decodable>(
+    public func send<Request: NetworkRequest, C: Decodable>(
         request: Request,
         codableType: C.Type,
         callbackQueue: DispatchQueue = .main,
@@ -175,7 +176,7 @@ struct AlamofireWrapper {
         }
     }
 
-    func cancelAll() {
+    public func cancelAll() {
         manager.session.getAllTasks { (tasks) in
             tasks.forEach { $0.cancel() }
         }
@@ -218,11 +219,11 @@ struct AlamofireWrapper {
 }
 
 extension AlamofireWrapper {
-    static let defaultHandler: AlamofireWrapperHandler = {
+    public static let defaultHandler: AlamofireWrapperHandler = {
         return AlamofireWrapperDefaultHandler()
     }()
 
-    static let defaultManager: AlamofireWrapperManager = {
+    public static let defaultManager: AlamofireWrapperManager = {
         return Session.default
     }()
 }

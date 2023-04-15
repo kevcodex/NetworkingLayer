@@ -107,3 +107,7 @@ extension DownloadRequest: AlamofireWrapperDownloadRequest {
 extension UploadRequest: AlamofireWrapperUploadRequest {
 
 }
+
+extension URLSessionTask: NetworkTask {
+    
+}

@@ -11,7 +11,7 @@ public typealias DownloadDestination = Alamofire.DownloadRequest.Destination
 
 /// A simple wrapper around Alamofire to abstract out the request building from client.
 public struct AlamofireWrapper: Networkable {
-
+    
     private let manager: AlamofireWrapperManager
     private let handler: AlamofireWrapperHandler
 
@@ -19,44 +19,44 @@ public struct AlamofireWrapper: Networkable {
     public var isConnectedToInternet: Bool {
         return Self.isConnectedToInternet
     }
-
-
+    
+    
     public static var isConnectedToInternet: Bool {
         return NetworkReachabilityManager()?.isReachable ?? false
     }
     #endif
 
     public init(manager: AlamofireWrapperManager = AlamofireWrapper.defaultManager,
-         handler: AlamofireWrapperHandler = AlamofireWrapper.defaultHandler) {
+                handler: AlamofireWrapperHandler = AlamofireWrapper.defaultHandler) {
         self.manager = manager
         self.handler = handler
     }
     
     // One problem is cancelling a task. Might want a wrapper that creates a task then sends.
     public func send<Request: NetworkRequest>(request: Request,
-                                       callbackQueue: DispatchQueue = .main,
-                                       progressHandler: ProgressHandler? = nil) async throws -> NetworkResponse {
+                                              callbackQueue: DispatchQueue = .main,
+                                              progressHandler: ProgressHandler? = nil) async throws -> NetworkResponse {
         guard let urlRequest = request.buildURLRequest() else {
             throw AlamofireWrapperError.badRequest(message: "Bad URL Request")
         }
-
+        
         switch request.requestType {
         case .requestData:
             return try await handler.handleDataRequest(for: urlRequest,
-                                                      manager: manager,
-                                                      request: request,
-                                                      callbackQueue: callbackQueue,
-                                                      progressHandler: progressHandler)
+                                                       manager: manager,
+                                                       request: request,
+                                                       callbackQueue: callbackQueue,
+                                                       progressHandler: progressHandler)
             
         case .download(let destination):
             return try await handler.handleDownloadRequest(for: urlRequest,
-                                                          manager: manager,
-                                                          request: request,
-                                                          callbackQueue: callbackQueue,
-                                                          destination: destination,
-                                                          progressHandler: progressHandler)
-
-
+                                                           manager: manager,
+                                                           request: request,
+                                                           callbackQueue: callbackQueue,
+                                                           destination: destination,
+                                                           progressHandler: progressHandler)
+            
+            
         case .uploadMultipart(let body):
             return try await handler.handleUploadMultipart(for: urlRequest,
                                                            multipartBody: body,
@@ -67,20 +67,20 @@ public struct AlamofireWrapper: Networkable {
                                                            uploadProgressHandler: progressHandler)
         }
     }
-
+    
     /// Send a request to expect data from response.
     /// - Parameter callbackQueue: nil will default to main.
     @discardableResult
     public func send<Request: NetworkRequest>(request: Request,
-                                       callbackQueue: DispatchQueue = .main,
-                                       progressHandler: ProgressHandler? = nil,
-                                       completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
-
+                                              callbackQueue: DispatchQueue = .main,
+                                              progressHandler: ProgressHandler? = nil,
+                                              completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+        
         guard let urlRequest = request.buildURLRequest() else {
             completion(.failure(.badRequest(message: "Bad URL Request")))
             return nil
         }
-
+        
         switch request.requestType {
         case .requestData:
             return handler.handleDataRequest(for: urlRequest,
@@ -89,7 +89,7 @@ public struct AlamofireWrapper: Networkable {
                                              callbackQueue: callbackQueue,
                                              progressHandler: progressHandler,
                                              completion: completion)
-
+            
         case .download(let destination):
             return handler.handleDownloadRequest(for: urlRequest,
                                                  manager: manager,
@@ -98,7 +98,7 @@ public struct AlamofireWrapper: Networkable {
                                                  destination: destination,
                                                  progressHandler: progressHandler,
                                                  completion: completion)
-
+            
         case .uploadMultipart(let body):
             return handler.handleUploadMultipart(for: urlRequest,
                                                  multipartBody: body,
@@ -110,7 +110,7 @@ public struct AlamofireWrapper: Networkable {
                                                  completion: completion)
         }
     }
-
+    
     // MARK: Codable Requests
     /// Makes a network request with any codable response object and will return it.
     @discardableResult
@@ -120,11 +120,11 @@ public struct AlamofireWrapper: Networkable {
         progressHandler: ProgressHandler? = nil,
         completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
     -> AlamofireWrapperBaseRequest? {
-
+        
         send(request: codableRequest,
              callbackQueue: callbackQueue,
              progressHandler: progressHandler) { (result) in
-
+            
             decode(result: result, completion: completion)
         }
     }
@@ -158,7 +158,7 @@ public struct AlamofireWrapper: Networkable {
         
         return try decodeSuccess(from: response)
     }
-
+    
     @discardableResult
     public func send<Request: NetworkRequest, C: Decodable>(
         request: Request,
@@ -167,15 +167,15 @@ public struct AlamofireWrapper: Networkable {
         progressHandler: ProgressHandler? = nil,
         completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
     -> AlamofireWrapperBaseRequest? {
-
+        
         send(request: request,
              callbackQueue: callbackQueue,
              progressHandler: progressHandler) { (result) in
-
+            
             decode(result: result, completion: completion)
         }
     }
-
+    
     public func cancelAll() {
         manager.session.getAllTasks { (tasks) in
             tasks.forEach { $0.cancel() }
@@ -222,7 +222,7 @@ extension AlamofireWrapper {
     public static let defaultHandler: AlamofireWrapperHandler = {
         return AlamofireWrapperDefaultHandler()
     }()
-
+    
     public static let defaultManager: AlamofireWrapperManager = {
         return Session.default
     }()
@@ -231,18 +231,18 @@ extension AlamofireWrapper {
 // MARK: - Error
 public enum AlamofireWrapperError: Error {
     case badRequest(message: String)
-
+    
     case responseError(Error, response: NetworkResponse?)
-
+    
     case alamofireError(AFError, response: NetworkResponse?)
-
+    
     case responseParseError(Error, response: NetworkResponse)
-
+    
     case unknown
-
+    
     public var response: NetworkResponse? {
         switch self {
-
+            
         case .badRequest:
             return nil
         case .responseError(_, let response):

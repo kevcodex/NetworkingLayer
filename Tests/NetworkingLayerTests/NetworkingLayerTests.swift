@@ -85,7 +85,7 @@ final class NetworkingLayerTests: XCTestCase {
 
             case .failure(let error):
                 switch error {
-                case .alamofireError(let error, let response):
+                case .responseError(let error, let response):
                     let expectation = Foo(foo: "test", fooz: "tester")
                     
                     let responseObject = try! JSONDecoder().decode(Foo.self, from: response!.data)

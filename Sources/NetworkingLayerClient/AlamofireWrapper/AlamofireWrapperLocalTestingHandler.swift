@@ -14,7 +14,7 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
         
         guard let url = request.testURL,
               let data = try? Data(contentsOf: url) else {
-                  throw AlamofireWrapperError.badRequest(message: "missing test data")
+                  throw NetworkResponseError.badRequest(message: "missing test data")
               }
         
         let response = NetworkResponse(statusCode: 200, data: data, request: nil, httpResponse: nil)
@@ -23,7 +23,7 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
     }
     
     
-    func handleDataRequest(for urlRequest: URLRequest, manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, progressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+    func handleDataRequest(for urlRequest: URLRequest, manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, progressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest? {
         
         guard let url = request.testURL,
               let data = try? Data(contentsOf: url) else {
@@ -43,10 +43,10 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
         
         
         // TODO: - setup return for download response
-        throw AlamofireWrapperError.badRequest(message: "TODO")
+        throw NetworkResponseError.badRequest(message: "TODO")
     }
     
-    func handleDownloadRequest(for urlRequest: URLRequest, manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, destination: DownloadDestination?, progressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+    func handleDownloadRequest(for urlRequest: URLRequest, manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, destination: DownloadDestination?, progressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest? {
         
         // TODO: - setup return for download response
         return nil
@@ -55,7 +55,7 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
     func handleUploadMultipart(for urlRequest: URLRequest, multipartBody: [MultipartData], manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, usingThreshold encodingMemoryThreshold: UInt64, uploadProgressHandler: ProgressHandler?) async throws -> NetworkResponse {
         guard let url = request.testURL,
               let data = try? Data(contentsOf: url) else {
-                  throw AlamofireWrapperError.badRequest(message: "missing test data")
+                  throw NetworkResponseError.badRequest(message: "missing test data")
               }
         
         let response = NetworkResponse(statusCode: 200, data: data, request: nil, httpResponse: nil)
@@ -63,7 +63,7 @@ struct AlamofireWrapperLocalTestingHandler: AlamofireWrapperHandler {
         return response
     }
     
-    func handleUploadMultipart(for urlRequest: URLRequest, multipartBody: [MultipartData], manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, usingThreshold encodingMemoryThreshold: UInt64, uploadProgressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+    func handleUploadMultipart(for urlRequest: URLRequest, multipartBody: [MultipartData], manager: AlamofireWrapperManager, request: NetworkRequest, callbackQueue: DispatchQueue, usingThreshold encodingMemoryThreshold: UInt64, uploadProgressHandler: ProgressHandler?, completion: @escaping (Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest? {
         
         guard let url = request.testURL,
               let data = try? Data(contentsOf: url) else {

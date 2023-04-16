@@ -20,7 +20,7 @@ public protocol AlamofireWrapperHandler {
                            request: NetworkRequest,
                            callbackQueue: DispatchQueue,
                            progressHandler: ProgressHandler?,
-                           completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?
+                           completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest?
     
     func handleDownloadRequest(for urlRequest: URLRequest,
                                manager: AlamofireWrapperManager,
@@ -35,7 +35,7 @@ public protocol AlamofireWrapperHandler {
                                callbackQueue: DispatchQueue,
                                destination: DownloadDestination?,
                                progressHandler: ProgressHandler?,
-                               completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?
+                               completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest?
     
     func handleUploadMultipart(for urlRequest: URLRequest,
                                multipartBody: [MultipartData],
@@ -52,7 +52,7 @@ public protocol AlamofireWrapperHandler {
                                callbackQueue: DispatchQueue,
                                usingThreshold encodingMemoryThreshold: UInt64,
                                uploadProgressHandler: ProgressHandler?,
-                               completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?
+                               completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest?
 }
 
 struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
@@ -92,7 +92,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                            request: NetworkRequest,
                            callbackQueue: DispatchQueue = .main,
                            progressHandler: ProgressHandler?,
-                           completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+                           completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest? {
 
         return manager
             .request(urlRequest)
@@ -148,7 +148,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                callbackQueue: DispatchQueue = .main,
                                destination: DownloadDestination?,
                                progressHandler: ProgressHandler?,
-                               completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest? {
+                               completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest? {
 
         // Note: Can't use responseData for downloading otherwise if destination url is nil, it will trigger a error for certain types of files. (this comment was from alamofire 4, not sure if the new 5 changed(
         let afDestination = createAFDestination(from: destination)
@@ -178,7 +178,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                                    request: urlRequest,
                                                    httpResponse: response)
                     
-                    let error = AlamofireWrapperError.alamofireError(error, response: response)
+                    let error = NetworkResponseError.responseError(error, response: response)
                     
                     completion(.failure(error))
                 case let (_, .some(error)):
@@ -239,7 +239,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
         callbackQueue: DispatchQueue = .main,
         usingThreshold encodingMemoryThreshold: UInt64 = MultipartFormData.encodingMemoryThreshold,
         uploadProgressHandler: ProgressHandler?,
-        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> AlamofireWrapperBaseRequest?  {
+        completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> AlamofireWrapperBaseRequest?  {
 
         return
             manager.upload(
@@ -270,7 +270,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
     
     private func handleDataResult(
         responseData: AFDataResponse<Data>,
-        urlRequest: URLRequest) -> Swift.Result<NetworkResponse, AlamofireWrapperError> {
+        urlRequest: URLRequest) -> Swift.Result<NetworkResponse, NetworkResponseError> {
             
             switch responseData.result {
             case .success(let data):
@@ -296,7 +296,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                                    request: urlRequest,
                                                    httpResponse: httpResponse)
 
-                    let error = AlamofireWrapperError.alamofireError(error, response: response)
+                    let error = NetworkResponseError.responseError(error, response: response)
                     
                     return .failure(error)
 
@@ -334,7 +334,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
     private func handleDataResponse(
         responseData: AFDataResponse<Data>,
         urlRequest: URLRequest,
-        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) {
+        completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) {
             
             let result = handleDataResult(responseData: responseData, urlRequest: urlRequest)
             
@@ -344,7 +344,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
     
     private func handleDownloadResult(
         downloadResponse: AFDownloadResponse<Data>,
-        urlRequest: URLRequest) -> Swift.Result<NetworkResponse, AlamofireWrapperError> {
+        urlRequest: URLRequest) -> Swift.Result<NetworkResponse, NetworkResponseError> {
             
             switch (downloadResponse.response, downloadResponse.error) {
             case let (response?, .none):
@@ -362,7 +362,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
                                                request: urlRequest,
                                                httpResponse: response)
                 
-                let error = AlamofireWrapperError.alamofireError(error, response: response)
+                let error = NetworkResponseError.responseError(error, response: response)
                 
                 return .failure(error)
             case let (_, .some(error)):
@@ -375,7 +375,7 @@ struct AlamofireWrapperDefaultHandler: AlamofireWrapperHandler {
     private func handleDownloadResponse(
         downloadResponse: AFDownloadResponse<Data>,
         urlRequest: URLRequest,
-        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) {
+        completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) {
             
             let result = handleDownloadResult(downloadResponse: downloadResponse, urlRequest: urlRequest)
             

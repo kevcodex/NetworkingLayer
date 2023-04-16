@@ -35,7 +35,7 @@ public struct AlamofireWrapper: Networkable {
                                               callbackQueue: DispatchQueue = .main,
                                               progressHandler: ProgressHandler? = nil) async throws -> NetworkResponse {
         guard let urlRequest = request.buildURLRequest() else {
-            throw AlamofireWrapperError.badRequest(message: "Bad URL Request")
+            throw NetworkResponseError.badRequest(message: "Bad URL Request")
         }
         
         switch request.requestType {
@@ -72,7 +72,7 @@ public struct AlamofireWrapper: Networkable {
     public func send<Request: NetworkRequest>(request: Request,
                                               callbackQueue: DispatchQueue = .main,
                                               progressHandler: ProgressHandler? = nil,
-                                              completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask? {
+                                              completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> NetworkTask? {
         
         guard let urlRequest = request.buildURLRequest() else {
             completion(.failure(.badRequest(message: "Bad URL Request")))
@@ -116,7 +116,7 @@ public struct AlamofireWrapper: Networkable {
         codableRequest: Request,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
-        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, NetworkResponseError>) -> Void)
     -> NetworkTask? {
         
         send(request: codableRequest,
@@ -163,7 +163,7 @@ public struct AlamofireWrapper: Networkable {
         codableType: C.Type,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
-        completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<C>, NetworkResponseError>) -> Void)
     -> NetworkTask? {
         
         send(request: request,
@@ -181,7 +181,7 @@ public struct AlamofireWrapper: Networkable {
     }
     
     private func decodeResult<C: Decodable>(
-        result: Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Swift.Result<ResponseObject<C>, AlamofireWrapperError> {
+        result: Swift.Result<NetworkResponse, NetworkResponseError>) -> Swift.Result<ResponseObject<C>, NetworkResponseError> {
             
             switch result {
             case .success(let response):
@@ -208,10 +208,10 @@ public struct AlamofireWrapper: Networkable {
     }
     
     private func decode<C: Decodable>(
-        result: Swift.Result<NetworkResponse, AlamofireWrapperError>,
-        completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void) {
+        result: Swift.Result<NetworkResponse, NetworkResponseError>,
+        completion: @escaping (Swift.Result<ResponseObject<C>, NetworkResponseError>) -> Void) {
             
-            let decodedResult: Swift.Result<ResponseObject<C>, AlamofireWrapperError> = decodeResult(result: result)
+            let decodedResult: Swift.Result<ResponseObject<C>, NetworkResponseError> = decodeResult(result: result)
             completion(decodedResult)
         }
 }
@@ -224,65 +224,4 @@ extension AlamofireWrapper {
     public static let defaultManager: AlamofireWrapperManager = {
         return Session.default
     }()
-}
-
-// MARK: - Error
-public enum AlamofireWrapperError: Error {
-    case badRequest(message: String)
-    
-    case responseError(Error, response: NetworkResponse?)
-    
-    case alamofireError(AFError, response: NetworkResponse?)
-    
-    case responseParseError(Error, response: NetworkResponse)
-    
-    case unknown
-    
-    public var response: NetworkResponse? {
-        switch self {
-            
-        case .badRequest:
-            return nil
-        case .responseError(_, let response):
-            return response
-        case .alamofireError(_, let response):
-            return response
-        case .responseParseError(_, let response):
-            return response
-        case .unknown:
-            return nil
-        }
-    }
-}
-
-extension AlamofireWrapperError: LocalizedError {
-    public var errorDescription: String? {
-        
-        let genericMessage = NetworkingLayer.errorObject(for: GenericErrorResponse.self, from: self)?.message
-        
-        switch self {
-        case .badRequest(let message):
-            return message
-        case .responseError(_, let response):
-            if let message = genericMessage {
-                return "\(message), code: \(response?.statusCode ?? 0)"
-            } else {
-                return "Networking Error, code: \(response?.statusCode ?? 0)"
-            }
-        case .alamofireError(_, let response):
-            if let message = genericMessage {
-                return "\(message), code: \(response?.statusCode ?? 0)"
-            } else {
-                return "Networking Error, code: \(response?.statusCode ?? 0)"
-            }
-        case .responseParseError(_, let response):
-            if let message = genericMessage {
-                return "\(message), code: \(response.statusCode)"
-            } else {
-                return "Parsing Error, code: \(response.statusCode)"
-            }
-        case .unknown:
-            return "Something Went Wrong"
-        }
-    }
 }

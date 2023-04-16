@@ -17,14 +17,14 @@ public protocol Networkable {
         request: Request,
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
-        completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask?
+        completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> NetworkTask?
     
     @discardableResult
     func send<Request: CodableRequest>(
         codableRequest: Request,
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
-        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, NetworkResponseError>) -> Void)
     -> NetworkTask?
     
     @discardableResult
@@ -41,7 +41,7 @@ public protocol Networkable {
         codableType: C.Type,
         callbackQueue: DispatchQueue,
         progressHandler: ProgressHandler?,
-        completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<C>, NetworkResponseError>) -> Void)
     -> NetworkTask?
     
     func cancelAll()
@@ -64,7 +64,7 @@ public struct NetworkingLayer {
     public func send<Request: NetworkRequest>(request: Request,
                                               callbackQueue: DispatchQueue = .main,
                                               progressHandler: ProgressHandler? = nil,
-                                              completion: @escaping (Swift.Result<NetworkResponse, AlamofireWrapperError>) -> Void) -> NetworkTask? {
+                                              completion: @escaping (Swift.Result<NetworkResponse, NetworkResponseError>) -> Void) -> NetworkTask? {
         wrapper.send(request: request, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
     }
     
@@ -83,7 +83,7 @@ public struct NetworkingLayer {
         codableRequest: Request,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
-        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<Request.Response>, NetworkResponseError>) -> Void)
     -> NetworkTask? {
         wrapper.send(codableRequest: codableRequest, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
     }
@@ -94,7 +94,7 @@ public struct NetworkingLayer {
         codableType: C.Type,
         callbackQueue: DispatchQueue = .main,
         progressHandler: ProgressHandler? = nil,
-        completion: @escaping (Swift.Result<ResponseObject<C>, AlamofireWrapperError>) -> Void)
+        completion: @escaping (Swift.Result<ResponseObject<C>, NetworkResponseError>) -> Void)
     -> NetworkTask? {
         
         wrapper.send(request: request, codableType: codableType, callbackQueue: callbackQueue, progressHandler: progressHandler, completion: completion)
@@ -118,7 +118,7 @@ public struct NetworkingLayer {
 
 extension NetworkingLayer {
     
-    public static func errorObject<T: Decodable>(for type: T.Type? = nil, from error: AlamofireWrapperError) -> T? {
+    public static func errorObject<T: Decodable>(for type: T.Type? = nil, from error: NetworkResponseError) -> T? {
         guard let data = error.response?.data else {
             return nil
         }

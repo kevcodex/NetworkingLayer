@@ -5,14 +5,14 @@ import Foundation
 
 public struct MultipartData {
 
-    let data: Data
+    public let data: Data
 
     /// The key name.
-    let name: String
+    public let name: String
 
-    let fileName: String?
+    public let fileName: String?
 
-    let mimeType: String?
+    public let mimeType: String?
 
     public init(data: Data, name: String, fileName: String? = nil, mimeType: String? = nil) {
         self.data = data

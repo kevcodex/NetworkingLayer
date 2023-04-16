@@ -8,8 +8,8 @@
 import Foundation
 
 public struct DownloadDestination {
-    let destinationURL: URL
-    let options: [Option]
+    public let destinationURL: URL
+    public let options: [Option]
     
     public enum Option: CaseIterable {
         case createIntermediateDirectories

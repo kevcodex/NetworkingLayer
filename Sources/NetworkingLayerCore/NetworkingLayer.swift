@@ -54,7 +54,7 @@ public struct NetworkingLayer {
     
     let wrapper: Networkable
     
-    public init(wrapper: Networkable = AlamofireWrapper()) {
+    public init(wrapper: Networkable) {
         self.wrapper = wrapper
     }
     

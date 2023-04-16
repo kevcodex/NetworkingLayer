@@ -1,7 +1,7 @@
 // Copyright © 2020 Gosite. All rights reserved.
 
 import Foundation
-@testable import NetworkingLayerClient
+@testable import NetworkingLayerCore
 
 enum MockStandardRequest: NetworkRequest {
     case validRequest

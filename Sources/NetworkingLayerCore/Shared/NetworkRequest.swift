@@ -27,6 +27,8 @@ public protocol NetworkRequest {
     var body: NetworkBody? { get }
     var requestType: RequestType { get }
     var acceptableStatusCodes: [Int] { get }
+    
+    var acceptableEmptyResponseCodes: Set<Int> { get }
 
     // TODO: - I am not sure if this is optimal strategy for UI tests.
     /// Test url that will get used for unit/UI testing. By default the location is the environment variable of the object name.
@@ -63,6 +65,10 @@ extension NetworkRequest {
 
     public var acceptableStatusCodes: [Int] {
         return Array(200..<300)
+    }
+    
+    public var acceptableEmptyResponseCodes: Set<Int> {
+        return [204, 205]
     }
 
     public var url: URL? {

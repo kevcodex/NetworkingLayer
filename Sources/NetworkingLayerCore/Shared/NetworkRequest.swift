@@ -21,10 +21,10 @@ public protocol NetworkRequest {
     var baseURL: URL? { get }
     var path: String { get }
     var method: HTTPMethod { get }
-    var parameters: NetworkQuery? { get set }
+    var parameters: NetworkQuery? { get }
     /// Can use dictionary or header to build
-    @HeaderBuilder var headers: [Header]? { get set }
-    var body: NetworkBody? { get set }
+    @HeaderBuilder var headers: [Header]? { get }
+    var body: NetworkBody? { get }
     var requestType: RequestType { get }
     var acceptableStatusCodes: [Int] { get }
     
